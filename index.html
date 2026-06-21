@@ -828,6 +828,7 @@ apiLoad(
         if(saved.data.rukisha)data.rukisha=saved.data.rukisha;
       }
       if(saved.visits){saved.visits.forEach(function(v){visits.push(v);});}
+      if(saved.plans){saved.plans.forEach(function(p){plans.push(p);});}
       if(saved.customAgencies){saved.customAgencies.forEach(function(ca){
         customAgencies.push(ca);
         if(!RERA.find(function(r){return r.a===ca.a;}))RERA.push(ca);
