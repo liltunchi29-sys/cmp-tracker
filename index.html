@@ -240,7 +240,7 @@
     Showing top 100 agencies by broker count. Full dataset available in the complete Google Sheet.<br>
     <strong>Assignment rule:</strong> Once a rep claims an agency, it is permanently locked — the other rep cannot select it. 🔒
   </div>
-  <input class="bl-search" type="text" placeholder="Search agency name…" oninput="filterBrokers(this.value)" id="bl-search">
+  <input class="bl-search" type="text" placeholder="Search agency name or broker name…" oninput="filterBrokers(this.value)" id="bl-search">
   <div id="broker-list"></div>
   <button class="add-btn" style="margin-top:8px" onclick="addCustomAgency()">+ Add Agency Not in This List</button>
 </div>
@@ -625,7 +625,7 @@ function filterBrokers(q){ renderBrokers(q); }
 function renderBrokers(q) {
   const list=document.getElementById('broker-list');
   const ql=(q||'').toLowerCase();
-  const filtered=RERA.filter(r=>!ql||r.a.toLowerCase().includes(ql));
+  const filtered=RERA.filter(r=>!ql||r.a.toLowerCase().includes(ql)||(r.b&&r.b.some(b=>b.toLowerCase().includes(ql))));
   list.innerHTML=filtered.slice(0,50).map((r,i)=>{
     const assigned=agAssign[r.a];
     const isLocked=!!assigned;
