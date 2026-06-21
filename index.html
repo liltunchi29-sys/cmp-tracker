@@ -6,16 +6,28 @@
 <title>CMP Sales Tracker</title>
 <style>
   :root {
-    --bg: #ffffff; --bg2: #f5f5f5; --bg3: #ebebeb;
-    --border: #e0e0e0; --border2: #d0d0d0;
-    --text: #1a1a1a; --text2: #555; --text3: #999;
+    --brand: #D18A5F;
+    --brand-dark: #B5713F;
+    --brand-light: #F5E8DC;
+    --green: #2D5540;
+    --green-dark: #1E3D2D;
+    --green-light: #E0EDE7;
+    --bg: #ffffff; --bg2: #F7F4F1; --bg3: #EDE8E3;
+    --border: #E2DAD3; --border2: #CFC4BA;
+    --text: #1a1a1a; --text2: #5C4F45; --text3: #9E9189;
     --radius: 8px; --radius-lg: 12px;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #141414; --bg2: #1e1e1e; --bg3: #272727;
-      --border: #2e2e2e; --border2: #3a3a3a;
-      --text: #e8e8e8; --text2: #aaa; --text3: #666;
+      --brand: #D18A5F;
+      --brand-dark: #E09A6F;
+      --brand-light: #2E1E12;
+      --green: #4A8A6A;
+      --green-dark: #2D5540;
+      --green-light: #152519;
+      --bg: #16100C; --bg2: #1E1510; --bg3: #271C14;
+      --border: #31221A; --border2: #3E2C21;
+      --text: #EDE5DF; --text2: #A89080; --text3: #5C4A40;
     }
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -24,7 +36,7 @@
   .sub { font-size: 12px; color: var(--text3); margin-bottom: 16px; }
   .tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
   .tab { padding: 6px 14px; border-radius: var(--radius); border: 1px solid var(--border); font-size: 12px; cursor: pointer; background: var(--bg); color: var(--text2); transition: all .15s; }
-  .tab.active { background: var(--bg2); color: var(--text); border-color: var(--border2); font-weight: 500; }
+  .tab.active { background: var(--brand); color: #fff; border-color: var(--brand-dark); font-weight: 500; }
   .tab:hover:not(.active) { background: var(--bg2); }
   .panel { display: none; } .panel.active { display: block; }
 
@@ -132,14 +144,14 @@
   .form-field select, .form-field input, .form-field textarea { width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:var(--radius); font-size:12px; background:var(--bg2); color:var(--text); font-family:inherit; }
   .form-field select:focus, .form-field input:focus, .form-field textarea:focus { outline:none; border-color:#888; }
   .form-actions { display:flex; gap:8px; margin-top:14px; }
-  .btn-primary { flex:1; padding:9px; background:#1A569B; color:#fff; border:none; border-radius:var(--radius); font-size:12px; font-weight:600; cursor:pointer; }
-  .btn-primary:hover { background:#14437c; }
+  .btn-primary { flex:1; padding:9px; background:var(--brand); color:#fff; border:none; border-radius:var(--radius); font-size:12px; font-weight:600; cursor:pointer; }
+  .btn-primary:hover { background:var(--brand-dark); }
   .btn-cancel { padding:9px 16px; background:var(--bg2); color:var(--text2); border:1px solid var(--border); border-radius:var(--radius); font-size:12px; cursor:pointer; }
 </style>
 </head>
 <body>
 
-<h1>CMP Sales Tracker</h1>
+<h1><span style="color:var(--brand)">CMP</span> Sales Tracker</h1>
 <p class="sub">Cash My Property — Internal Sales Tool</p>
 
 <div class="tabs">
@@ -164,7 +176,7 @@
   <div class="sec" style="margin-top:4px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
       <div class="stl" style="margin-bottom:0">📅 Visit Planner</div>
-      <button onclick="showPlanModal()" style="font-size:11px;padding:5px 12px;background:#1A569B;color:#fff;border:none;border-radius:var(--radius);cursor:pointer;font-weight:600">+ Plan a Visit</button>
+      <button onclick="showPlanModal()" style="font-size:11px;padding:5px 12px;background:var(--brand);color:#fff;border:none;border-radius:var(--radius);cursor:pointer;font-weight:600">+ Plan a Visit</button>
     </div>
     <div style="overflow-x:auto">
     <table>
@@ -240,8 +252,8 @@
     <div class="stl">The 7-Stage Pipeline</div>
 
     <div class="guide-step">
-      <div class="step-num" style="background:#E1F5EE;color:#085041">1</div>
-      <div><div class="step-title">Identify</div><div class="step-desc">Find a new agency to target. Log their name, area/district, city, contact person, and phone number. Set the lead temperature: <strong>Hot</strong> (ready now), <strong>Warm</strong> (interested but not urgent), or <strong>Cold</strong> (unknown/untested).</div><div class="step-rule" style="background:#E1F5EE;color:#085041">✅ Move to Stage 2 once the agency is fully logged with contact details.</div></div>
+      <div class="step-num" style="background:#E0EDE7;color:#1E3D2D">1</div>
+      <div><div class="step-title">Identify</div><div class="step-desc">Find a new agency to target. Log their name, area/district, city, contact person, and phone number. Set the lead temperature: <strong>Hot</strong> (ready now), <strong>Warm</strong> (interested but not urgent), or <strong>Cold</strong> (unknown/untested).</div><div class="step-rule" style="background:#E0EDE7;color:#1E3D2D">✅ Move to Stage 2 once the agency is fully logged with contact details.</div></div>
     </div>
 
     <div class="guide-step">
@@ -298,7 +310,7 @@
       <div class="cond-title">📊 Registration Tracking</div>
       <div class="cond-body">
         Registration is tracked as a <strong>ratio</strong> (registered / total licensed brokers), not as a single name.<br><br>
-        • <span style="color:#1D9E75;font-weight:600">Green (≥ 70%)</span> — Strong. Most of the agency is on CMP.<br>
+        • <span style="color:#2D5540;font-weight:600">Green (≥ 70%)</span> — Strong. Most of the agency is on CMP.<br>
         • <span style="color:#EF9F27;font-weight:600">Amber (40–69%)</span> — In progress. Keep pushing.<br>
         • <span style="color:#D85A30;font-weight:600">Red (&lt; 40%)</span> — Needs attention. Follow up immediately.<br><br>
         Update the registered count in the agency card each time a new broker signs up. Do not wait until all brokers are done.
@@ -425,7 +437,7 @@
 <script>
 const SL=['Identify','Qualify','Outreach','Demo','Register','Follow up','Report'];
 const SC=[
-  {bg:'#E1F5EE',tx:'#085041',bd:'#5DCAA5'},
+  {bg:'#E0EDE7',tx:'#1E3D2D',bd:'#4A8A6A'},
   {bg:'#E6F1FB',tx:'#0C447C',bd:'#378ADD'},
   {bg:'#FAEEDA',tx:'#633806',bd:'#EF9F27'},
   {bg:'#EEEDFE',tx:'#3C3489',bd:'#7F77DD'},
@@ -434,7 +446,7 @@ const SC=[
   {bg:'#F1EFE8',tx:'#444441',bd:'#888780'}
 ];
 const DONE={bg:'#EAF3DE',tx:'#27500A',bd:'transparent'};
-const PC={High:{bg:'#E1F5EE',tx:'#085041'},Medium:{bg:'#FAEEDA',tx:'#633806'},Low:{bg:'#F1EFE8',tx:'#444441'}};
+const PC={High:{bg:'#E0EDE7',tx:'#1E3D2D'},Medium:{bg:'#FAEEDA',tx:'#633806'},Low:{bg:'#F1EFE8',tx:'#444441'}};
 const TC={Hot:{bg:'#FCEBEB',tx:'#A32D2D'},Warm:{bg:'#FAEEDA',tx:'#633806'},Cold:{bg:'#F1EFE8',tx:'#444441'}};
 const SRC={Team:{bg:'#EEEDFE',tx:'#3C3489'},Sunan:{bg:'#E6F1FB',tx:'#0C447C'},Cold:{bg:'#F1EFE8',tx:'#444441'}};
 const RC={imad:{bg:'#E6F1FB',tx:'#0C447C',bar:'#378ADD',in:'IM'},rukisha:{bg:'#FAECE7',tx:'#712B13',bar:'#D85A30',in:'RU'}};
@@ -481,7 +493,7 @@ function renderRep(rep) {
     const pc=PC[a.priority]||PC.Medium, tc=TC[a.trust]||TC.Cold, src=SRC[a.source]||SRC.Cold;
     const pct=a.total>0?Math.round((a.licensed/a.total)*100):0;
     const rp=a.total>0?Math.round((a.regCount/a.total)*100):0;
-    const rc=rp>=70?'#1D9E75':rp>=40?'#EF9F27':'#D85A30';
+    const rc=rp>=70?'#2D5540':rp>=40?'#EF9F27':'#D85A30';
     const pips=SL.map((s,si)=>{
       const sn=si+1;
       let c=sn<a.stage?DONE:sn===a.stage?SC[si]:{bg:'#f5f5f5',tx:'#999',bd:'transparent'};
@@ -502,7 +514,7 @@ function renderRep(rep) {
       <div class="agrid">
         <div class="as"><div class="asl">Total Agents</div><div class="asv">${a.total}</div></div>
         <div class="as"><div class="asl">Licensed</div><div class="asv">${a.licensed} <span style="font-size:10px;color:#999">(${pct}%)</span></div></div>
-        <div class="as"><div class="asl">Listing Submitted</div><div class="asv" style="color:${a.listingSub==='Yes'?'#085041':'#999'}">${a.listingSub}</div></div>
+        <div class="as"><div class="asl">Listing Submitted</div><div class="asv" style="color:${a.listingSub==='Yes'?'#1E3D2D':'#999'}">${a.listingSub}</div></div>
       </div>
       <div class="reg-block">
         <div class="reg-hdr">
@@ -743,7 +755,7 @@ function renderPlanner() {
       <td style="font-size:11px;color:#666">${p.contact || '—'}</td>
       <td style="font-size:11px;color:#777;max-width:160px">${p.notes || '—'}</td>
       <td style="white-space:nowrap">
-        <button onclick="markPlanDone(${p.id})" title="Mark as visited — opens visit log" style="font-size:10px;padding:2px 8px;border-radius:99px;border:1px solid #1D9E75;background:#E1F5EE;color:#085041;cursor:pointer;margin-right:3px">✓ Done</button>
+        <button onclick="markPlanDone(${p.id})" title="Mark as visited — opens visit log" style="font-size:10px;padding:2px 8px;border-radius:99px;border:1px solid var(--green);background:var(--green-light);color:var(--green-dark);cursor:pointer;margin-right:3px">✓ Done</button>
         <button onclick="deletePlan(${p.id})" title="Remove" style="font-size:10px;padding:2px 8px;border-radius:99px;border:1px solid var(--border);background:none;color:#aaa;cursor:pointer">✕</button>
       </td>
     </tr>`;
