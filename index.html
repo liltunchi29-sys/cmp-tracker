@@ -469,9 +469,32 @@ function apiLoad(onOk,onErr){
   else{fetch(API_URL+'?action=load',{credentials:'omit'}).then(function(r){return r.json();}).then(onOk).catch(onErr);}
 }
 function apiSave(payload,onOk,onErr){
-  if(HOSTED){google.script.run.withSuccessHandler(onOk).withFailureHandler(onErr).saveData(payload);}
-  else{fetch(API_URL,{method:'POST',mode:'no-cors',credentials:'omit',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)})
-    .then(function(){onOk({success:true});}).catch(onErr);}
+  if(HOSTED){google.script.run.withSuccessHandler(onOk).withFailureHandler(onErr).saveData(payload);return;}
+  // Cross-origin POST to Apps Script. NO 'no-cors' — that returns an opaque response,
+  // so .then() fires "success" even on a 503 and failed saves look saved. The endpoint
+  // returns a real CORS response, so we can read the status + body and report failures.
+  // text/plain keeps it a "simple request" (no preflight). One auto-retry rides out a
+  // transient Apps Script 503.
+  var body=JSON.stringify(payload);
+  var attempt=function(triesLeft){
+    fetch(API_URL,{method:'POST',credentials:'omit',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:body})
+      .then(function(r){
+        if(!r.ok)throw new Error('HTTP '+r.status);
+        return r.text();
+      })
+      .then(function(t){
+        var res=null;try{res=JSON.parse(t);}catch(e){}
+        // require a parseable JSON ack — a 200 with an HTML/empty body (a Google
+        // login or error interstitial) is NOT a confirmed save, don't fake success.
+        if(!res||res.success===false)throw new Error((res&&res.error)||'unconfirmed save (unexpected response)');
+        onOk(res);
+      })
+      .catch(function(e){
+        if(triesLeft>0){setTimeout(function(){attempt(triesLeft-1);},1500);}
+        else{onErr(e);}
+      });
+  };
+  attempt(1);
 }
 
 // AUTO-SAVE
