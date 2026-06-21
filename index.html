@@ -154,6 +154,26 @@
   </div>
   <div class="sec"><div class="stl">Pipeline</div><div class="frow" id="funnel"></div></div>
   <div class="sec"><div class="stl">By Rep</div><div id="repbars"></div></div>
+  <div class="sec" style="margin-top:4px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div class="stl" style="margin-bottom:0">📅 Visit Planner</div>
+      <button onclick="showPlanModal()" style="font-size:11px;padding:5px 12px;background:#1A569B;color:#fff;border:none;border-radius:var(--radius);cursor:pointer;font-weight:600">+ Plan a Visit</button>
+    </div>
+    <div style="overflow-x:auto">
+    <table>
+      <thead><tr>
+        <th style="width:20%">Agency</th>
+        <th style="width:12%">Date</th>
+        <th style="width:9%">Time</th>
+        <th style="width:9%">Rep</th>
+        <th style="width:12%">Contact</th>
+        <th>Notes</th>
+        <th style="width:14%"></th>
+      </tr></thead>
+      <tbody id="planner-body"><tr><td colspan="7" style="text-align:center;padding:20px;color:#999;font-size:12px">No planned visits yet. Click <strong>+ Plan a Visit</strong> to schedule one.</td></tr></tbody>
+    </table>
+    </div>
+  </div>
 </div>
 
 <!-- IMAD -->
@@ -646,10 +666,130 @@ function renderDash() {
   }).join('');
 }
 
+// ── VISIT PLANNER ──────────────────────────────────────────────────────────
+let plans = [];
+
+function showPlanModal() {
+  const dl = document.getElementById('plan-agency-dl');
+  dl.innerHTML = '';
+  RERA.map(r => r.a).sort().forEach(name => {
+    const opt = document.createElement('option'); opt.value = name; dl.appendChild(opt);
+  });
+  document.getElementById('pf-agency').value = '';
+  document.getElementById('pf-date').value = '';
+  document.getElementById('pf-time').value = '';
+  document.getElementById('pf-contact').value = '';
+  document.getElementById('pf-notes').value = '';
+  document.getElementById('pf-rep').value = 'Rukisha';
+  document.getElementById('plan-modal').classList.add('open');
+}
+function closePlanModal() { document.getElementById('plan-modal').classList.remove('open'); }
+function submitPlan() {
+  const agency = document.getElementById('pf-agency').value.trim();
+  if (!agency) { alert('Please enter an agency name.'); return; }
+  plans.push({
+    id: Date.now(),
+    agency,
+    date: document.getElementById('pf-date').value,
+    time: document.getElementById('pf-time').value,
+    rep: document.getElementById('pf-rep').value,
+    contact: document.getElementById('pf-contact').value.trim(),
+    notes: document.getElementById('pf-notes').value.trim(),
+    done: false
+  });
+  plans.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
+  renderPlanner();
+  closePlanModal();
+}
+function markPlanDone(id) {
+  const p = plans.find(x => x.id === id);
+  if (!p) return;
+  p.done = true;
+  renderPlanner();
+  // Pre-fill visit log modal
+  showVisitModal();
+  document.getElementById('vf-agency').value = p.agency;
+  if (p.date) document.getElementById('vf-date').value = p.date;
+  document.getElementById('vf-rep').value = p.rep;
+  document.getElementById('vf-remarks').value = p.notes || '';
+}
+function deletePlan(id) {
+  plans = plans.filter(x => x.id !== id);
+  renderPlanner();
+}
+function renderPlanner() {
+  const el = document.getElementById('planner-body');
+  if (!el) return;
+  const upcoming = plans.filter(p => !p.done);
+  if (!upcoming.length) {
+    el.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:#999;font-size:12px">No planned visits yet. Click <strong>+ Plan a Visit</strong> to schedule one.</td></tr>';
+    return;
+  }
+  el.innerHTML = upcoming.map(p => {
+    const ds = p.date ? new Date(p.date + 'T00:00:00').toLocaleDateString('en-GB', {weekday:'short',day:'numeric',month:'short'}) : '—';
+    const rc2 = RC[p.rep.toLowerCase()] || {bg:'#eee',tx:'#555',in:'?'};
+    return `<tr>
+      <td style="font-weight:500;font-size:12px">${p.agency}</td>
+      <td style="font-size:12px">${ds}</td>
+      <td style="font-size:12px">${p.time || '—'}</td>
+      <td><span class="pill" style="background:${rc2.bg};color:${rc2.tx}">${p.rep}</span></td>
+      <td style="font-size:11px;color:#666">${p.contact || '—'}</td>
+      <td style="font-size:11px;color:#777;max-width:160px">${p.notes || '—'}</td>
+      <td style="white-space:nowrap">
+        <button onclick="markPlanDone(${p.id})" title="Mark as visited — opens visit log" style="font-size:10px;padding:2px 8px;border-radius:99px;border:1px solid #1D9E75;background:#E1F5EE;color:#085041;cursor:pointer;margin-right:3px">✓ Done</button>
+        <button onclick="deletePlan(${p.id})" title="Remove" style="font-size:10px;padding:2px 8px;border-radius:99px;border:1px solid var(--border);background:none;color:#aaa;cursor:pointer">✕</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
 renderDash();
 renderRep('rukisha');
 renderRep('imad');
 renderBrokers('');
+renderPlanner();
 </script>
+
+<!-- PLAN A VISIT MODAL -->
+<div class="modal-overlay" id="plan-modal" onclick="if(event.target===this)closePlanModal()">
+  <div class="modal" style="width:400px">
+    <h3>📅 Plan a Visit</h3>
+    <div class="form-field">
+      <label>Agency * (type to search)</label>
+      <input type="text" id="pf-agency" list="plan-agency-dl" placeholder="Search agency name…" autocomplete="off">
+      <datalist id="plan-agency-dl"></datalist>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <div class="form-field">
+        <label>Date *</label>
+        <input type="date" id="pf-date">
+      </div>
+      <div class="form-field">
+        <label>Time</label>
+        <input type="time" id="pf-time">
+      </div>
+    </div>
+    <div class="form-field">
+      <label>Rep</label>
+      <select id="pf-rep">
+        <option value="Rukisha">Rukisha</option>
+        <option value="Imad">Imad</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <label>Contact Person</label>
+      <input type="text" id="pf-contact" placeholder="e.g. Pavan, Zeba…">
+    </div>
+    <div class="form-field">
+      <label>Notes</label>
+      <textarea id="pf-notes" rows="2" placeholder="Purpose, agreed time, anything to remember…" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12px;background:var(--bg2);color:var(--text);font-family:inherit;resize:none"></textarea>
+    </div>
+    <div class="form-actions">
+      <button class="btn-cancel" onclick="closePlanModal()">Cancel</button>
+      <button class="btn-primary" onclick="submitPlan()">Save Plan</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
