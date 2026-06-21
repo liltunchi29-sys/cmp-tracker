@@ -814,6 +814,22 @@ function renderPlanner() {
   }).join('');
 }
 
+
+// Auto-fill broker counts from RERA for any agency with total=0
+function reraFill() {
+  Object.keys(data).forEach(rep => {
+    data[rep].forEach(a => {
+      if (a.total === 0) {
+        const n = a.name.toLowerCase();
+        // Try exact match first, then partial
+        let match = RERA.find(r => r.a.toLowerCase() === n);
+        if (!match) match = RERA.find(r => r.a.toLowerCase().includes(n) || n.includes(r.a.toLowerCase().replace(/ real estate.*$/,'')));
+        if (match) { a.total = match.c; a.licensed = match.c; }
+      }
+    });
+  });
+}
+reraFill();
 renderDash();
 renderRep('rukisha');
 renderRep('imad');
