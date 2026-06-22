@@ -349,6 +349,7 @@
   <button class="tab" onclick="sw('rukisha')">👤 Rukisha</button>
   <button class="tab" onclick="sw('visits')">📅 Visit Log</button>
   <button class="tab" onclick="sw('brokers')">🏢 Broker List</button>
+  <button class="tab" onclick="sw('tickets')">🐞 Bug Tickets</button>
   <button class="tab" onclick="sw('guide')">📖 How to Use</button>
 </div>
 
@@ -412,6 +413,30 @@
   <button class="add-btn" style="margin-top:8px" onclick="addCustomAgency()">+ Add Agency Not in This List</button>
 </div>
 
+<div class="panel" id="panel-tickets">
+  <div class="bl-info">
+    <strong>🐞 Bug Tickets</strong> — log any bug or issue you hit in the CMP app.<br>
+    A rep reports it here → Moise passes it to the developer → once fixed, Moise <strong>closes</strong> it with a note. 🔧<br>
+    Closed tickets stay below as a full record of what was fixed.
+  </div>
+  <div class="sec planner-sec">
+    <div class="planner-hdr">
+      <div class="stl">🐞 Bug Tickets</div>
+      <button class="plan-btn" onclick="showTicketModal()">+ Report a Bug</button>
+    </div>
+    <div style="overflow-x:auto">
+    <table id="ticket-table">
+      <thead><tr>
+        <th>#</th><th>Date</th><th>Reported by</th><th>Bug / Issue</th><th>Severity</th><th>Status</th><th>Resolution</th><th></th>
+      </tr></thead>
+      <tbody id="ticket-body">
+        <tr><td colspan="8" style="text-align:center;padding:20px;color:var(--text3)">No bugs reported yet. Click <strong>+ Report a Bug</strong> to log one.</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</div>
+
 <div class="panel" id="panel-guide">
   <div class="sec" style="margin-bottom:12px">
     <div class="stl">The 7-Stage Pipeline</div>
@@ -457,6 +482,7 @@ var agAssign={};
 var data={imad:[],rukisha:[]};
 var visits=[];
 var plans=[];
+var tickets=[];
 var customAgencies=[];
 
 // DATA ACCESS SHIM — works both as a Google-hosted web app AND as a standalone/local
@@ -504,7 +530,7 @@ function autoSave(){
   if(el){el.textContent='⏳ Saving...';el.style.color='#888';el.style.background='#f5f5f5';el.style.borderColor='#e0e0e0';}
   clearTimeout(_saveTimer);
   _saveTimer=setTimeout(function(){
-    apiSave({agAssign:agAssign,data:data,visits:visits,plans:plans,customAgencies:customAgencies},
+    apiSave({agAssign:agAssign,data:data,visits:visits,plans:plans,customAgencies:customAgencies,tickets:tickets},
       function(){
         if(el){el.textContent='✓ Saved';el.style.color='#1D9E75';el.style.background='#EAF3DE';el.style.borderColor='#5DCAA5';}
         setTimeout(function(){if(el){el.textContent='● Live';el.style.color='#999';el.style.background='#f5f5f5';el.style.borderColor='#e0e0e0';}},2000);
@@ -516,7 +542,7 @@ function autoSave(){
 }
 
 function sw(id){
-  var ids=['dash','imad','rukisha','visits','brokers','guide'];
+  var ids=['dash','imad','rukisha','visits','brokers','tickets','guide'];
   document.querySelectorAll('.tab').forEach(function(t,i){t.classList.toggle('active',ids[i]===id);});
   document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
   document.getElementById('panel-'+id).classList.add('active');
@@ -840,6 +866,88 @@ function renderPlanner() {
 }
 
 
+// ── BUG TICKETS ───────────────────────────────────────────────────────────────
+function showTicketModal(){
+  document.getElementById('tk-reporter').value='Moise';
+  document.getElementById('tk-area').value='';
+  document.getElementById('tk-desc').value='';
+  document.getElementById('tk-sev').value='Medium';
+  document.getElementById('ticket-modal').classList.add('open');
+}
+function closeTicketModal(){ document.getElementById('ticket-modal').classList.remove('open'); }
+function submitTicket(){
+  var desc=document.getElementById('tk-desc').value.trim();
+  if(!desc){alert('Please describe the bug.');return;}
+  tickets.push({
+    id: Date.now(),
+    date: new Date().toISOString().slice(0,10),
+    reporter: document.getElementById('tk-reporter').value,
+    area: document.getElementById('tk-area').value.trim(),
+    desc: desc,
+    severity: document.getElementById('tk-sev').value,
+    status: 'Open',
+    resolution: '',
+    closedDate: ''
+  });
+  closeTicketModal();
+  renderTickets();
+  autoSave();
+}
+function closeTicket(id){
+  var t=tickets.find(function(x){return x.id===id;});
+  if(!t)return;
+  var note=prompt('How was it fixed? (resolution note — optional)', t.resolution||'');
+  if(note===null)return;
+  t.status='Closed'; t.resolution=note.trim(); t.closedDate=new Date().toISOString().slice(0,10);
+  renderTickets(); autoSave();
+}
+function reopenTicket(id){
+  var t=tickets.find(function(x){return x.id===id;});
+  if(!t)return;
+  t.status='Open'; t.closedDate='';
+  renderTickets(); autoSave();
+}
+function deleteTicket(id){
+  if(!confirm('Delete this ticket permanently?'))return;
+  tickets=tickets.filter(function(x){return x.id!==id;});
+  renderTickets(); autoSave();
+}
+function renderTickets(){
+  var el=document.getElementById('ticket-body');
+  if(!el)return;
+  if(!tickets.length){
+    el.innerHTML='<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--text3)">No bugs reported yet. Click <strong>+ Report a Bug</strong> to log one.</td></tr>';
+    return;
+  }
+  var SEV={Low:{bg:'rgba(150,150,150,.15)',tx:'#9aa0a6'},Medium:{bg:'rgba(224,160,74,.18)',tx:'#C7891F'},High:{bg:'rgba(216,90,48,.18)',tx:'#D85A30'},Critical:{bg:'rgba(224,72,72,.2)',tx:'#e05555'}};
+  var ST={Open:{bg:'rgba(216,90,48,.18)',tx:'#D85A30'},Closed:{bg:'rgba(47,169,128,.18)',tx:'#2FA980'}};
+  var order={Critical:0,High:1,Medium:2,Low:3};
+  var sorted=tickets.slice().sort(function(a,b){
+    if((a.status==='Open')!==(b.status==='Open'))return a.status==='Open'?-1:1;
+    if(a.status==='Open')return (order[a.severity]||9)-(order[b.severity]||9);
+    return b.id-a.id;
+  });
+  el.innerHTML=sorted.map(function(t){
+    var sv=SEV[t.severity]||SEV.Medium, st=ST[t.status]||ST.Open;
+    var bug=(t.area?'<strong>'+t.area+':</strong> ':'')+t.desc;
+    var actions = t.status==='Open'
+      ? '<button class="plan-done-btn" onclick="closeTicket('+t.id+')">✓ Close</button>'
+      : '<button class="plan-done-btn" style="background:rgba(150,150,150,.15);color:var(--text2);border-color:var(--border2)" onclick="reopenTicket('+t.id+')">↩ Reopen</button>';
+    return '<tr'+(t.status==='Closed'?' style="opacity:.6"':'')+'>'+
+      '<td style="color:var(--text3);font-size:11px">#'+String(t.id).slice(-4)+'</td>'+
+      '<td>'+(t.date||'—')+'</td>'+
+      '<td>'+(t.reporter||'—')+'</td>'+
+      '<td style="font-weight:500">'+bug+'</td>'+
+      '<td><span style="background:'+sv.bg+';color:'+sv.tx+';padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600">'+t.severity+'</span></td>'+
+      '<td><span style="background:'+st.bg+';color:'+st.tx+';padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600">'+t.status+'</span></td>'+
+      '<td style="color:var(--text2);font-size:11px">'+(t.resolution||(t.status==='Closed'?'—':''))+'</td>'+
+      '<td style="white-space:nowrap">'+actions+
+        '<button class="plan-del-btn" onclick="deleteTicket('+t.id+')">✕</button>'+
+      '</td>'+
+    '</tr>';
+  }).join('');
+}
+
 // LOAD DATA ON STARTUP
 apiLoad(
   function(result){
@@ -852,6 +960,7 @@ apiLoad(
       }
       if(saved.visits){saved.visits.forEach(function(v){visits.push(v);});}
       if(saved.plans){saved.plans.forEach(function(p){plans.push(p);});}
+      if(saved.tickets){saved.tickets.forEach(function(t){tickets.push(t);});}
       if(saved.customAgencies){saved.customAgencies.forEach(function(ca){
         customAgencies.push(ca);
         if(!RERA.find(function(r){return r.a===ca.a;}))RERA.push(ca);
@@ -860,6 +969,7 @@ apiLoad(
       renderRep('rukisha');
       renderVisits();
       renderPlanner();
+      renderTickets();
     }
     renderDash();
     initBrokers();
@@ -971,6 +1081,43 @@ apiLoad(
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closePlanModal()">Cancel</button>
       <button class="btn-save" onclick="submitPlan()">Save Plan</button>
+    </div>
+  </div>
+</div>
+
+<!-- BUG TICKET MODAL -->
+<div class="modal-overlay" id="ticket-modal" onclick="if(event.target===this)closeTicketModal()">
+  <div class="modal-box">
+    <h3>🐞 Report a Bug</h3>
+    <div class="mf">
+      <label>Reported by</label>
+      <select id="tk-reporter">
+        <option value="Imad">Imad</option>
+        <option value="Rukisha">Rukisha</option>
+        <option value="Moise">Moise</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div class="mf">
+      <label>Where in the app? (optional)</label>
+      <input type="text" id="tk-area" placeholder="e.g. Login, Listing page, Search…">
+    </div>
+    <div class="mf">
+      <label>Describe the bug *</label>
+      <textarea id="tk-desc" placeholder="What happened? What did you expect to happen?"></textarea>
+    </div>
+    <div class="mf">
+      <label>Severity</label>
+      <select id="tk-sev">
+        <option value="Low">Low</option>
+        <option value="Medium" selected>Medium</option>
+        <option value="High">High</option>
+        <option value="Critical">Critical</option>
+      </select>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeTicketModal()">Cancel</button>
+      <button class="btn-save" onclick="submitTicket()">Submit Bug</button>
     </div>
   </div>
 </div>
