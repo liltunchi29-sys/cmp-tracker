@@ -524,13 +524,15 @@ function apiSave(payload,onOk,onErr){
 }
 
 // AUTO-SAVE
-var _saveTimer=null;
+var _saveTimer=null, _pendingSave=null;
 function autoSave(){
   var el=document.getElementById('save-status');
   if(el){el.textContent='⏳ Saving...';el.style.color='#888';el.style.background='#f5f5f5';el.style.borderColor='#e0e0e0';}
+  _pendingSave={agAssign:agAssign,data:data,visits:visits,plans:plans,customAgencies:customAgencies,tickets:tickets};
   clearTimeout(_saveTimer);
   _saveTimer=setTimeout(function(){
-    apiSave({agAssign:agAssign,data:data,visits:visits,plans:plans,customAgencies:customAgencies,tickets:tickets},
+    var payload=_pendingSave; _pendingSave=null;
+    apiSave(payload,
       function(){
         if(el){el.textContent='✓ Saved';el.style.color='#1D9E75';el.style.background='#EAF3DE';el.style.borderColor='#5DCAA5';}
         setTimeout(function(){if(el){el.textContent='● Live';el.style.color='#999';el.style.background='#f5f5f5';el.style.borderColor='#e0e0e0';}},2000);
@@ -540,6 +542,16 @@ function autoSave(){
       });
   },800);
 }
+// If the page is refreshed/closed before the 800ms timer fires, flush the pending
+// save immediately. keepalive lets the request complete during unload, so a quick
+// refresh after an edit never loses it.
+function flushSave(){
+  if(!_pendingSave)return;
+  var payload=_pendingSave; _pendingSave=null; clearTimeout(_saveTimer);
+  try{ fetch(API_URL,{method:'POST',credentials:'omit',keepalive:true,headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)}); }catch(e){}
+}
+window.addEventListener('pagehide', flushSave);
+document.addEventListener('visibilitychange', function(){ if(document.visibilityState==='hidden') flushSave(); });
 
 function sw(id){
   var ids=['dash','imad','rukisha','visits','brokers','tickets','guide'];
@@ -789,12 +801,18 @@ function submitVisit() {
 }
 
 // ── VISIT PLANNER ─────────────────────────────────────────────────────────────
-function showPlanModal() {
+var _editPlanId=null;
+function fillAgencyDatalist(){
   var dl = document.getElementById('plan-agency-dl');
   dl.innerHTML = '';
   RERA.map(function(r){return r.a;}).sort().forEach(function(name){
     var opt = document.createElement('option'); opt.value = name; dl.appendChild(opt);
   });
+}
+function showPlanModal() {
+  _editPlanId=null;
+  fillAgencyDatalist();
+  document.getElementById('plan-modal-title').textContent='🗓️ Plan a Visit';
   document.getElementById('pf-agency').value = '';
   document.getElementById('pf-date').value = '';
   document.getElementById('pf-time').value = '';
@@ -803,21 +821,41 @@ function showPlanModal() {
   document.getElementById('pf-notes').value = '';
   document.getElementById('plan-modal').classList.add('open');
 }
+function editPlan(id){
+  var p = plans.find(function(x){return x.id===id;});
+  if(!p) return;
+  _editPlanId = id;
+  fillAgencyDatalist();
+  document.getElementById('plan-modal-title').textContent='✏️ Edit Visit';
+  document.getElementById('pf-agency').value = p.agency||'';
+  document.getElementById('pf-date').value = p.date||'';
+  document.getElementById('pf-time').value = p.time||'';
+  document.getElementById('pf-rep').value = p.rep||'Rukisha';
+  document.getElementById('pf-contact').value = p.contact||'';
+  document.getElementById('pf-notes').value = p.notes||'';
+  document.getElementById('plan-modal').classList.add('open');
+}
 function closePlanModal() { document.getElementById('plan-modal').classList.remove('open'); }
 
 function submitPlan() {
   var agency = document.getElementById('pf-agency').value.trim();
   if (!agency) { alert('Please enter an agency name.'); return; }
-  plans.push({
-    id: Date.now(),
+  var fields = {
     agency: agency,
     date: document.getElementById('pf-date').value,
     time: document.getElementById('pf-time').value,
     rep: document.getElementById('pf-rep').value,
     contact: document.getElementById('pf-contact').value.trim(),
-    notes: document.getElementById('pf-notes').value.trim(),
-    done: false
-  });
+    notes: document.getElementById('pf-notes').value.trim()
+  };
+  if (_editPlanId) {
+    var p = plans.find(function(x){return x.id===_editPlanId;});
+    if (p) { for (var k in fields) p[k] = fields[k]; }
+    _editPlanId = null;
+  } else {
+    fields.id = Date.now(); fields.done = false;
+    plans.push(fields);
+  }
   closePlanModal();
   renderPlanner();
   autoSave();
@@ -858,6 +896,7 @@ function renderPlanner() {
       '<td>' + (p.contact||'—') + '</td>' +
       '<td style="color:var(--text2);font-size:11px">' + (p.notes||'—') + '</td>' +
       '<td style="white-space:nowrap">' +
+        '<button class="plan-done-btn" style="background:rgba(150,150,150,.15);color:var(--text2);border-color:var(--border2)" onclick="editPlan(' + p.id + ')">✎ Edit</button>' +
         '<button class="plan-done-btn" onclick="markPlanDone(' + p.id + ')">✓ Done</button>' +
         '<button class="plan-del-btn" onclick="deletePlan(' + p.id + ')">✕</button>' +
       '</td>' +
@@ -1049,7 +1088,7 @@ apiLoad(
 <!-- VISIT PLAN MODAL -->
 <div class="modal-overlay" id="plan-modal" onclick="if(event.target===this)closePlanModal()">
   <div class="modal-box">
-    <h3>🗓️ Plan a Visit</h3>
+    <h3 id="plan-modal-title">🗓️ Plan a Visit</h3>
     <div class="mf">
       <label>Agency *</label>
       <input type="text" id="pf-agency" list="plan-agency-dl" placeholder="Search agency name…" autocomplete="off">
