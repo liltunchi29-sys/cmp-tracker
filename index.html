@@ -331,15 +331,63 @@
   .plan-done-btn{padding:3px 10px;background:rgba(54,214,166,.15);color:var(--accent2);border:1px solid var(--accent2);border-radius:6px;font-size:11px;cursor:pointer}
   .plan-del-btn{padding:3px 8px;background:rgba(255,80,80,.1);color:#ff6b6b;border:1px solid rgba(255,80,80,.3);border-radius:6px;font-size:11px;cursor:pointer;margin-left:4px}
 
+  /* ── THEME TOGGLE ── */
+  .topbar-right{display:flex;align-items:center;gap:8px}
+  #theme-toggle{font-size:13px;line-height:1;padding:5px 10px;border-radius:99px;cursor:pointer;background:rgba(255,255,255,.06);border:1px solid var(--border2);color:var(--text2);transition:all .15s}
+  #theme-toggle:hover{border-color:var(--accent);color:var(--text)}
+
+  /* ── LIGHT MODE ── */
+  body.light{
+    --bg:#f4f6f2;--bg2:#ffffff;--bg3:#eef1ec;--border:#e3e6e0;--border2:#cfd4cb;
+    --text:#1c241d;--text2:#566058;--text3:#8a948b;
+    background:
+      radial-gradient(ellipse 900px 500px at 90% -10%,rgba(209,138,95,.10),transparent 60%),
+      radial-gradient(ellipse 700px 400px at -5% 10%,rgba(96,176,128,.08),transparent 55%),
+      #eef0ec;
+  }
+  body.light h1{background:linear-gradient(100deg,#cd7f4f 20%,#b46a43 55%,#4a3526)}
+  body.light .mv{background:none;-webkit-text-fill-color:#1c241d;color:#1c241d}
+  body.light #save-status{background:rgba(29,158,117,.10);border-color:rgba(29,158,117,.30);color:#1d9e75;box-shadow:none}
+  body.light #theme-toggle{background:#ffffff}
+  body.light .tab{background:#ffffff;border-color:var(--border2);box-shadow:0 1px 2px rgba(0,0,0,.07)}
+  body.light .tab:hover:not(.active){background:#f1f3ee;color:var(--text);box-shadow:0 2px 5px rgba(0,0,0,.08)}
+  body.light .tab:active{box-shadow:inset 0 1px 3px rgba(0,0,0,.12)}
+  body.light .tab.active{background:rgba(209,138,95,.15);border-color:rgba(209,138,95,.6);color:#8a4a23;box-shadow:0 0 0 1px rgba(209,138,95,.22),0 2px 6px rgba(209,138,95,.18)}
+  body.light .mc{background:#ffffff;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+  body.light .sec{background:#ffffff;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+  body.light .rrow{background:#f6f8f4}
+  body.light .bw,body.light .reg-bw{background:#e6e8e2}
+  body.light .card{background:#ffffff;box-shadow:0 1px 5px rgba(0,0,0,.07)}
+  body.light .card:hover{box-shadow:0 3px 14px rgba(0,0,0,.1),0 0 0 1px var(--border2)}
+  body.light .as,body.light .reg-block{background:#f4f6f1}
+  body.light .reg-ctrl input,body.light .fl-ta,body.light .bl-search{background:#ffffff;box-shadow:inset 0 1px 2px rgba(0,0,0,.06)}
+  body.light .ag-row{background:#ffffff;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+  body.light .ag-hdr:hover{background:rgba(0,0,0,.025)}
+  body.light .ag-body{background:#f7f8f5}
+  body.light .ag-count{color:#9c5a2e}
+  body.light .broker-chip{background:#f1f3ee}
+  body.light .assign-btn{background:#f4f6f1;color:var(--text2);box-shadow:0 1px 2px rgba(0,0,0,.07)}
+  body.light .assign-btn:hover:not(:disabled){background:#e9ece5;color:var(--text);box-shadow:0 2px 5px rgba(0,0,0,.09)}
+  body.light .guide-step{background:#ffffff;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+  body.light .loading-overlay{background:rgba(244,246,242,.94);color:var(--text2)}
+  body.light .fs{box-shadow:0 1px 3px rgba(0,0,0,.12)}
+  body.light .sp{box-shadow:0 1px 2px rgba(0,0,0,.14)}
+  body.light .list-no{background:#eef1ec;color:var(--text3);border-color:var(--border2)}
+  body.light ::-webkit-scrollbar-thumb{background:#cfd3cb;border-color:#eef0ec}
+  body.light ::-webkit-scrollbar-thumb:hover{background:#b8bdb2}
+
 </style>
 </head>
-<body>
+<body class="light">
 
 <div id="loading-overlay" class="loading-overlay">Loading tracker data...</div>
 
 <div class="topbar">
   <h1>CMP Sales Tracker</h1>
-  <span id="save-status">Loading...</span>
+  <div class="topbar-right">
+    <button id="theme-toggle" onclick="toggleTheme()" title="Switch light / dark">🌙</button>
+    <span id="save-status">Loading...</span>
+  </div>
 </div>
 <p class="sub">Cash My Property — Internal Sales Tool</p>
 
@@ -561,6 +609,19 @@ function sw(id){
   if(id==='brokers')initBrokers();
   if(id==='dash')renderDash();
 }
+
+// ── THEME (light / dark) ──────────────────────────────────────────────────────
+function applyTheme(t){
+  document.body.classList.toggle('light', t!=='dark');
+  var b=document.getElementById('theme-toggle');
+  if(b) b.textContent = (t==='dark') ? '☀️' : '🌙';
+}
+function toggleTheme(){
+  var t=document.body.classList.contains('light') ? 'dark' : 'light';
+  try{localStorage.setItem('cmp-theme',t);}catch(e){}
+  applyTheme(t);
+}
+applyTheme((function(){try{return localStorage.getItem('cmp-theme');}catch(e){return null;}})()||'light');
 
 function setStage(rep,idx,s){data[rep][idx].stage=s;renderRep(rep);renderDash();autoSave();}
 function setReg(rep,idx,val){data[rep][idx].regCount=Math.max(0,Math.min(parseInt(val)||0,data[rep][idx].total));renderRep(rep);renderDash();autoSave();}
