@@ -427,10 +427,12 @@
 </div>
 
 <div class="panel" id="panel-imad">
+  <input class="bl-search" type="text" id="search-imad" placeholder="Search company or contact name…" oninput="renderRep('imad')" style="margin-bottom:12px">
   <div id="ag-imad"><div class="empty-state"><div>📋</div><p><strong>No agencies yet</strong></p><small>Assign agencies from the Broker List tab.</small></div></div>
 </div>
 
 <div class="panel" id="panel-rukisha">
+  <input class="bl-search" type="text" id="search-rukisha" placeholder="Search company or contact name…" oninput="renderRep('rukisha')" style="margin-bottom:12px">
   <div id="ag-rukisha"><div class="empty-state"><div>📋</div><p><strong>No agencies yet</strong></p><small>Assign agencies from the Broker List tab.</small></div></div>
 </div>
 
@@ -673,7 +675,12 @@ function editInfo(rep,idx){
 function renderRep(rep){
   var el=document.getElementById('ag-'+rep);
   if(!data[rep].length){el.innerHTML='<div class="empty-state"><div>📋</div><p><strong>No agencies yet</strong></p><small>Assign agencies from the Broker List tab, or add one manually below.</small></div>';return;}
-  el.innerHTML=data[rep].map(function(a,i){
+  var q=(document.getElementById('search-'+rep)||{}).value||'';
+  q=q.toLowerCase().trim();
+  var filtered=q?data[rep].filter(function(a){return a.name.toLowerCase().includes(q)||(a.contact||'').toLowerCase().includes(q);}):data[rep];
+  if(!filtered.length){el.innerHTML='<div class="empty-state"><div>🔍</div><p><strong>No match</strong></p><small>Try a different name.</small></div>';return;}
+  el.innerHTML=filtered.map(function(a,i){
+    i=data[rep].indexOf(a);
     var pc=PC[a.priority]||PC.Medium,tc=TC[a.trust]||TC.Cold,src=SRC[a.source]||SRC.Cold;
     var pct=a.total>0?Math.round((a.licensed/a.total)*100):0;
     var rp=a.total>0?Math.round((a.regCount/a.total)*100):0;
