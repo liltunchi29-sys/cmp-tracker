@@ -435,6 +435,17 @@
 </div>
 
 <div class="panel" id="panel-visits">
+  <div class="sec" id="done-plans-sec" style="display:none;margin-bottom:16px">
+    <div class="stl" style="color:#d18a5f">✓ Completed Plans</div>
+    <div style="overflow-x:auto">
+    <table>
+      <thead><tr>
+        <th style="width:22%">Agency</th><th style="width:11%">Date</th><th style="width:9%">Rep</th><th style="width:12%">Contact</th><th>Notes</th><th style="width:80px"></th>
+      </tr></thead>
+      <tbody id="done-plans-body"></tbody>
+    </table>
+    </div>
+  </div>
   <div class="sec">
     <div class="stl">All Visits</div>
     <div style="overflow-x:auto">
@@ -791,13 +802,32 @@ function addVisit(){showVisitModal();}
 
 function renderVisits(){
   var tb=document.getElementById('vbody');
-  if(!visits.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:24px;color:#999;font-size:12px">No visits logged yet.</td></tr>';return;}
-  var OC2={Interested:{bg:'#e6fbf1',tx:'#0c7c44'},'Signed Up':{bg:'#EAF3DE',tx:'#27500A'},Scheduled:{bg:'#eefeed',tx:'#3c8934'},Pending:{bg:'#FAEEDA',tx:'#633806'},'No response':{bg:'#F1EFE8',tx:'#444441'}};
-  tb.innerHTML=visits.map(function(v){
-    var oc=OC2[v.result]||{bg:'#F1EFE8',tx:'#444441'};
-    var rc=v.reg==='Yes'?{bg:'#EAF3DE',tx:'#27500A'}:{bg:'#F1EFE8',tx:'#444441'};
-    return '<tr><td style="font-weight:500">'+v.agency+'</td><td>'+v.date+'</td><td>'+v.rep+'</td><td>'+v.method+'</td><td><span class="pill" style="background:'+oc.bg+';color:'+oc.tx+'">'+v.result+'</span></td><td><span class="pill" style="background:'+rc.bg+';color:'+rc.tx+'">'+v.reg+'</span></td><td style="font-size:11px;color:#555">'+( v.remarks||'—')+'</td></tr>';
+  if(!visits.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;padding:24px;color:#999;font-size:12px">No visits logged yet.</td></tr>';}
+  else{
+    var OC2={Interested:{bg:'#e6fbf1',tx:'#0c7c44'},'Signed Up':{bg:'#EAF3DE',tx:'#27500A'},Scheduled:{bg:'#eefeed',tx:'#3c8934'},Pending:{bg:'#FAEEDA',tx:'#633806'},'No response':{bg:'#F1EFE8',tx:'#444441'}};
+    tb.innerHTML=visits.map(function(v){
+      var oc=OC2[v.result]||{bg:'#F1EFE8',tx:'#444441'};
+      var rc=v.reg==='Yes'?{bg:'#EAF3DE',tx:'#27500A'}:{bg:'#F1EFE8',tx:'#444441'};
+      return '<tr><td style="font-weight:500">'+v.agency+'</td><td>'+v.date+'</td><td>'+v.rep+'</td><td>'+v.method+'</td><td><span class="pill" style="background:'+oc.bg+';color:'+oc.tx+'">'+v.result+'</span></td><td><span class="pill" style="background:'+rc.bg+';color:'+rc.tx+'">'+v.reg+'</span></td><td style="font-size:11px;color:#555">'+( v.remarks||'—')+'</td></tr>';
+    }).join('');
+  }
+  var donePlans=plans.filter(function(p){return p.done;});
+  var dpSec=document.getElementById('done-plans-sec');
+  var dpBody=document.getElementById('done-plans-body');
+  if(!donePlans.length){dpSec.style.display='none';return;}
+  dpSec.style.display='';
+  dpBody.innerHTML=donePlans.map(function(p){
+    return '<tr style="background:#fdf8f4"><td style="font-weight:500">'+p.agency+'</td><td>'+p.date+(p.time?' @ '+p.time:'')+'</td><td>'+p.rep+'</td><td style="font-size:11px;color:#555">'+(p.contact||'—')+'</td><td style="font-size:11px;color:#555">'+(p.notes||'—')+'</td><td><button onclick="revertPlan('+p.id+')" style="font-size:11px;padding:3px 8px;border:1px solid #d18a5f;background:#fff;color:#d18a5f;border-radius:4px;cursor:pointer">↩ Revert</button></td></tr>';
   }).join('');
+}
+
+function revertPlan(id){
+  var p=plans.find(function(x){return x.id===id;});
+  if(!p)return;
+  p.done=false;
+  renderPlanner();
+  renderVisits();
+  autoSave();
 }
 
 function renderDash(){
