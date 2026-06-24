@@ -518,7 +518,10 @@
     All agencies searchable. Click a broker name to see their phone &amp; email.<br>
     <strong>Assignment rule:</strong> Once a rep claims an agency, it is permanently locked — the other rep cannot select it. 🔒
   </div>
-  <input class="bl-search" type="text" placeholder="Search agency name…" oninput="filterBrokers(this.value)" id="bl-search">
+  <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
+    <input class="bl-search" type="text" placeholder="Search agency name…" oninput="filterBrokers(this.value)" id="bl-search" style="margin-bottom:0;flex:1">
+    <a href="https://docs.google.com/spreadsheets/d/1m-R3bOS4P_pzuq1ZIE0VRd793dStoufJf7dRv-QE8Qs/edit" target="_blank" style="white-space:nowrap;padding:8px 14px;border-radius:8px;background:var(--accent);color:#fff;font-size:12px;font-weight:700;text-decoration:none;border:none;cursor:pointer">📋 Registered Brokers</a>
+  </div>
   <div id="broker-list"></div>
   <button class="add-btn" style="margin-top:8px" onclick="addCustomAgency()">+ Add Agency Not in This List</button>
 </div>
