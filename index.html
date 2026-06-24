@@ -736,8 +736,8 @@ function doLogin(){
   document.getElementById('login-err').style.display='none';
   var roleLabel=currentRole()==='super-admin'?'👑 Owner':currentRole()==='admin'?'🛡️ Admin':'👤 Rep';
   document.getElementById('user-badge').textContent=USER_LABELS[currentUser]+' · '+roleLabel;
-  document.getElementById('user-badge').style.display='';
-  document.getElementById('logout-btn').style.display='';
+  document.getElementById('user-badge').style.display='inline-block';
+  document.getElementById('logout-btn').style.display='inline-block';
   applyRoleUI();
 }
 function logout(){
@@ -1287,7 +1287,7 @@ apiLoad(
     var ov=document.getElementById('loading-overlay');
     if(ov)ov.style.display='none';
     var saved_user=sessionStorage.getItem('cmp-user');
-    if(saved_user&&PINS[saved_user]){currentUser=saved_user;_selectedRole=saved_user;document.getElementById('login-overlay').style.display='none';var roleLabel=ROLES[saved_user]==='super-admin'?'👑 Owner':ROLES[saved_user]==='admin'?'🛡️ Admin':'👤 Rep';document.getElementById('user-badge').textContent=USER_LABELS[saved_user]+' · '+roleLabel;document.getElementById('user-badge').style.display='';document.getElementById('logout-btn').style.display='';applyRoleUI();}
+    if(saved_user&&PINS[saved_user]){currentUser=saved_user;_selectedRole=saved_user;document.getElementById('login-overlay').style.display='none';var roleLabel=ROLES[saved_user]==='super-admin'?'👑 Owner':ROLES[saved_user]==='admin'?'🛡️ Admin':'👤 Rep';document.getElementById('user-badge').textContent=USER_LABELS[saved_user]+' · '+roleLabel;document.getElementById('user-badge').style.display='inline-block';document.getElementById('logout-btn').style.display='inline-block';applyRoleUI();}
   },
   function(err){
     renderDash();
