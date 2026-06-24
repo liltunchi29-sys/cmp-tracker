@@ -431,15 +431,13 @@
 <div class="topbar">
   <h1>CMP Sales Tracker</h1>
   <div class="topbar-right">
-    <span id="user-badge"></span>
-    <button id="logout-btn" onclick="logout()">Sign Out</button>
     <button id="theme-toggle" onclick="toggleTheme()" title="Switch light / dark">🌙</button>
     <span id="save-status">Loading...</span>
   </div>
 </div>
 <p class="sub">Cash My Property — Internal Sales Tool</p><!-- v2.1 -->
 
-<div class="tabs">
+<div class="tabs" style="position:relative">
   <button class="tab active" onclick="sw('dash')">📊 Dashboard</button>
   <button class="tab" onclick="sw('imad')">👤 Imad</button>
   <button class="tab" onclick="sw('rukisha')">👤 Rukisha</button>
@@ -448,6 +446,10 @@
   <button class="tab" onclick="sw('tickets')">🐞 Bug Tickets</button>
   <button class="tab" onclick="sw('guide')">📖 How to Use</button>
   <button class="tab" id="tab-admin" onclick="sw('admin')" style="display:none">⚙️ Admin</button>
+  <div id="user-info" style="display:none;margin-left:auto;align-items:center;gap:8px;padding-left:12px">
+    <span id="user-badge" style="font-size:11px;padding:4px 10px;background:var(--bg3);border:1px solid var(--border2);border-radius:99px;color:var(--text2)"></span>
+    <button id="logout-btn" onclick="logout()" style="font-size:11px;padding:4px 12px;border-radius:99px;cursor:pointer;background:rgba(216,90,48,.15);border:1px solid rgba(216,90,48,.4);color:#D85A30;font-weight:600">🚪 Sign Out</button>
+  </div>
 </div>
 
 <div class="panel active" id="panel-dash">
@@ -736,16 +738,14 @@ function doLogin(){
   document.getElementById('login-err').style.display='none';
   var roleLabel=currentRole()==='super-admin'?'👑 Owner':currentRole()==='admin'?'🛡️ Admin':'👤 Rep';
   document.getElementById('user-badge').textContent=USER_LABELS[currentUser]+' · '+roleLabel;
-  document.getElementById('user-badge').style.display='inline-block';
-  document.getElementById('logout-btn').style.display='inline-block';
+  document.getElementById('user-info').style.display='flex';
   applyRoleUI();
 }
 function logout(){
   currentUser=null;_selectedRole=null;
   sessionStorage.removeItem('cmp-user');
   document.getElementById('login-overlay').style.display='flex';
-  document.getElementById('user-badge').style.display='none';
-  document.getElementById('logout-btn').style.display='none';
+  document.getElementById('user-info').style.display='none';
   document.getElementById('pin-input').value='';
   document.getElementById('user-select').value='';
   sw('dash');
@@ -1287,7 +1287,7 @@ apiLoad(
     var ov=document.getElementById('loading-overlay');
     if(ov)ov.style.display='none';
     var saved_user=sessionStorage.getItem('cmp-user');
-    if(saved_user&&PINS[saved_user]){currentUser=saved_user;_selectedRole=saved_user;document.getElementById('login-overlay').style.display='none';var roleLabel=ROLES[saved_user]==='super-admin'?'👑 Owner':ROLES[saved_user]==='admin'?'🛡️ Admin':'👤 Rep';document.getElementById('user-badge').textContent=USER_LABELS[saved_user]+' · '+roleLabel;document.getElementById('user-badge').style.display='inline-block';document.getElementById('logout-btn').style.display='inline-block';applyRoleUI();}
+    if(saved_user&&PINS[saved_user]){currentUser=saved_user;_selectedRole=saved_user;document.getElementById('login-overlay').style.display='none';var roleLabel=ROLES[saved_user]==='super-admin'?'👑 Owner':ROLES[saved_user]==='admin'?'🛡️ Admin':'👤 Rep';document.getElementById('user-badge').textContent=USER_LABELS[saved_user]+' · '+roleLabel;document.getElementById('user-info').style.display='flex';applyRoleUI();}
   },
   function(err){
     renderDash();
