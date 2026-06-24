@@ -1123,6 +1123,24 @@ apiLoad(
     var ov=document.getElementById('loading-overlay');
     if(ov)ov.style.display='none';
   });
+
+function silentRefresh(){
+  if(_pendingSave)return;
+  apiLoad(function(result){
+    if(!result||!result.success||!result.data)return;
+    var saved=result.data;
+    if(saved.agAssign){agAssign={};Object.keys(saved.agAssign).forEach(function(k){agAssign[k]=saved.agAssign[k];});}
+    if(saved.data){if(saved.data.imad)data.imad=saved.data.imad;if(saved.data.rukisha)data.rukisha=saved.data.rukisha;}
+    if(saved.visits){visits=saved.visits;}
+    if(saved.plans){plans=saved.plans;}
+    if(saved.tickets){tickets=saved.tickets;}
+    if(saved.customAgencies){customAgencies=saved.customAgencies;saved.customAgencies.forEach(function(ca){if(!RERA.find(function(r){return r.a===ca.a;}))RERA.push(ca);});}
+    renderRep('imad');renderRep('rukisha');renderVisits();renderPlanner();renderTickets();renderDash();
+    var el=document.getElementById('save-status');
+    if(el){el.textContent='● Live';el.style.color='#999';}
+  },function(){});
+}
+setInterval(silentRefresh,30000);
 </script>
 
 <!-- VISIT LOG MODAL -->
