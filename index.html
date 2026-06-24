@@ -414,8 +414,8 @@
       <select id="user-select" onchange="selectRole(this.value)" style="width:100%;padding:9px 10px;border-radius:8px;border:1px solid var(--border2);background:var(--bg);color:var(--text);font-size:13px">
         <option value="">— select —</option>
         <option value="owner">👑 Owner (Super Admin)</option>
-        <option value="moise">🛡️ Moise (Admin)</option>
-        <option value="sonnen">🛡️ Sonnen (Admin)</option>
+        <option value="moise">🛡️ Moiz (Admin)</option>
+        <option value="sonnen">🛡️ Sunain (Admin)</option>
         <option value="imad">👤 Imad</option>
         <option value="rukisha">👤 Rukisha</option>
       </select>
@@ -529,7 +529,7 @@
 <div class="panel" id="panel-tickets">
   <div class="bl-info">
     <strong>🐞 Bug Tickets</strong> — log any bug or issue you hit in the CMP app.<br>
-    A rep reports it here → Moise passes it to the developer → once fixed, Moise <strong>closes</strong> it with a note. 🔧<br>
+    A rep reports it here → Moiz passes it to the developer → once fixed, Moiz <strong>closes</strong> it with a note. 🔧<br>
     Closed tickets stay below as a full record of what was fixed.
   </div>
   <div class="sec planner-sec">
@@ -591,8 +591,8 @@
         <label>User</label>
         <select id="admin-user-sel">
           <option value="owner">👑 Owner (Super Admin)</option>
-          <option value="moise">🛡️ Moise (Admin)</option>
-          <option value="sonnen">🛡️ Sonnen (Admin)</option>
+          <option value="moise">🛡️ Moiz (Admin)</option>
+          <option value="sonnen">🛡️ Sunain (Admin)</option>
           <option value="imad">👤 Imad (Rep)</option>
           <option value="rukisha">👤 Rukisha (Rep)</option>
         </select>
@@ -651,7 +651,7 @@ var customAgencies=[];
 var currentUser=null;
 var PINS={owner:'2536',moise:'7878',sonnen:'3671',imad:'1414',rukisha:'7878'};
 var ROLES={owner:'super-admin',moise:'admin',sonnen:'admin',imad:'rep',rukisha:'rep'};
-var USER_LABELS={owner:'Owner',moise:'Moise',sonnen:'Sonnen',imad:'Imad',rukisha:'Rukisha'};
+var USER_LABELS={owner:'Owner',moise:'Moiz',sonnen:'Sunain',imad:'Imad',rukisha:'Rukisha'};
 var _selectedRole=null;
 
 // DATA ACCESS SHIM — works both as a Google-hosted web app AND as a standalone/local
@@ -1175,7 +1175,7 @@ function renderPlanner() {
 
 // ── BUG TICKETS ───────────────────────────────────────────────────────────────
 function showTicketModal(){
-  document.getElementById('tk-reporter').value='Moise';
+  document.getElementById('tk-reporter').value='Moiz';
   document.getElementById('tk-area').value='';
   document.getElementById('tk-desc').value='';
   document.getElementById('tk-sev').value='Medium';
@@ -1423,7 +1423,7 @@ setInterval(silentRefresh,30000);
       <select id="tk-reporter">
         <option value="Imad">Imad</option>
         <option value="Rukisha">Rukisha</option>
-        <option value="Moise">Moise</option>
+        <option value="Moiz">Moiz</option>
         <option value="Other">Other</option>
       </select>
     </div>
