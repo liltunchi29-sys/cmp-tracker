@@ -817,7 +817,7 @@ function renderVisits(){
   if(!donePlans.length){dpSec.style.display='none';return;}
   dpSec.style.display='';
   dpBody.innerHTML=donePlans.map(function(p){
-    return '<tr style="background:#fdf8f4"><td style="font-weight:500">'+p.agency+'</td><td>'+p.date+(p.time?' @ '+p.time:'')+'</td><td>'+p.rep+'</td><td style="font-size:11px;color:#555">'+(p.contact||'—')+'</td><td style="font-size:11px;color:#555">'+(p.notes||'—')+'</td><td><button onclick="revertPlan('+p.id+')" style="font-size:11px;padding:3px 8px;border:1px solid #d18a5f;background:#fff;color:#d18a5f;border-radius:4px;cursor:pointer">↩ Revert</button></td></tr>';
+    return '<tr><td style="font-weight:500">'+p.agency+'</td><td>'+p.date+(p.time?' @ '+p.time:'')+'</td><td>'+p.rep+'</td><td style="font-size:11px;color:#555">'+(p.contact||'—')+'</td><td style="font-size:11px;color:#555">'+(p.notes||'—')+'</td><td><button onclick="revertPlan('+p.id+')" style="font-size:11px;padding:3px 8px;border:1px solid #d18a5f;background:#fff;color:#d18a5f;border-radius:4px;cursor:pointer">↩ Revert</button></td></tr>';
   }).join('');
 }
 
