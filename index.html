@@ -1309,6 +1309,8 @@ apiLoad(
 
 function silentRefresh(){
   if(_pendingSave)return;
+  var ae=document.activeElement;
+  if(ae&&(ae.tagName==='INPUT'||ae.tagName==='TEXTAREA'))return;
   apiLoad(function(result){
     if(!result||!result.success||!result.data)return;
     var saved=result.data;
